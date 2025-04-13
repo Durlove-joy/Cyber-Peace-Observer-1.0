@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Issue } from '../models/issueModel';
+import { IIssue } from '../models/issueModel';
 
 const connectDB = async () => {
     try {
