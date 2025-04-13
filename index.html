@@ -50,22 +50,27 @@
       bottom: 10px;
       left: 10px;
       background: rgba(255, 255, 255, 0.3); /* Transparent white background */
-      padding: 20px;
+      padding: 15px; /* Reduced padding */
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       z-index: 1000; /* Form layer */
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      width: 300px;
+      gap: 8px; /* Reduced gap between elements */
+      width: 250px; /* Reduced width */
     }
 
     #form input, #form select, #form textarea, #form button {
-      padding: 10px;
-      font-size: 14px;
+      padding: 8px; /* Reduced padding */
+      font-size: 12px; /* Reduced font size */
       border: 1px solid #ccc;
       border-radius: 4px;
-      width: 100%;
+      width: 100%; /* Ensure all elements take up the full width of the form */
+      box-sizing: border-box; /* Prevent padding from affecting width */
+    }
+
+    #form textarea {
+      resize: none; /* Prevent resizing of the textarea */
     }
 
     #form button {
@@ -132,8 +137,12 @@
     // Initialize EmailJS
     emailjs.init("dzPDwAz4pdjkgezsx"); // Replace with your actual Public API key
 
-    // Initialize the map with a dark theme
-    const map = L.map('map').setView([20, 0], 2);
+    // Initialize the map with a dynamic zoom level based on screen size
+    const isMobile = window.innerWidth <= 768; // Check if the device is mobile (width <= 768px)
+    const initialZoom = isMobile ? 3 : 2; // Use a higher zoom level for mobile devices
+
+    const map = L.map('map').setView([20, 0], initialZoom); // Set the initial zoom level dynamically
+
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
       subdomains: 'abcd',
@@ -333,6 +342,12 @@
     fetch('/api/geocode?query=location')
       .then(response => response.json())
       .then(data => console.log(data));
+
+    window.addEventListener('resize', () => {
+      const isMobile = window.innerWidth <= 768;
+      const newZoom = isMobile ? 3 : 2;
+      map.setZoom(newZoom); // Dynamically adjust the zoom level
+    });
   </script>
 </body>
 </html>
