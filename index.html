@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cyber Peace Observer</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #map {
+      position: absolute;
+      top: 0; /* Start the map from the top */
+      left: 0;
+      width: 100%;
+      height: 100%; /* Full height of the viewport */
+      z-index: 0; /* Base layer */
+    }
+
+    .leaflet-control {
+      z-index: 1500; /* Ensure map controls are above all other elements */
+    }
+
+    #title {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5); /* Transparent black background */
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+      z-index: 1500; /* Ensure the title is above the map */
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    #form {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.3); /* Transparent white background */
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000; /* Form layer */
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 300px;
+    }
+
+    #form input, #form select, #form textarea, #form button {
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+    }
+
+    #form button {
+      background: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #form button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- Title -->
+  <div id="title">Cyber Peace Observer</div>
+
+  <!-- Search Section -->
+  <div id="search" style="position: absolute; top: 50px; right: 10px; z-index: 1000; background: rgba(255, 255, 255, 0.3); padding: 10px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+    <input type="text" id="searchLocation" placeholder="Search Location" style="padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; width: 200px;" oninput="showSuggestions()" />
+    <button onclick="searchLocation()" style="padding: 10px; font-size: 14px; background: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
+    <ul id="suggestions" style="list-style: none; margin: 0; padding: 0; background: rgba(255, 255, 255, 0.9); border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto; display: none; position: absolute; top: 50px; right: 10px; z-index: 1001; width: 200px;"></ul>
+  </div>
+
+  <!-- Location Input with Suggestions -->
+  <div id="form" style="background: rgba(255, 255, 255, 0.3);">
+    <h2 style="text-align: center; margin-bottom: 10px;">Report an Issue</h2>
+    <!-- Issue Type -->
+    <select id="issueType" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%;">
+      <option value="" disabled selected>Select Issue Type</option>
+      <option value="rumor">Rumor</option>
+      <option value="hateSpeech">Hate Speech</option>
+    </select>
+
+    <!-- Additional Type Section -->
+    <select id="subType" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%; margin-top: 10px;">
+      <option value="" disabled selected>Select a Type</option>
+      <option value="political">Political</option>
+      <option value="religious">Religious</option>
+      <option value="community">Community</option>
+      <option value="others">Others</option>
+    </select>
+
+    <!-- Location -->
+    <div style="position: relative;">
+      <input type="text" id="location" placeholder="Location (e.g., City)" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%; margin-top: 10px;" oninput="showLocationSuggestions()" />
+      <ul id="locationSuggestions" style="list-style: none; margin: 0; padding: 0; background: rgba(255, 255, 255, 0.9); border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto; display: none; position: absolute; top: 100%; left: 0; width: 100%; z-index: 1001;"></ul>
+    </div>
+
+    <!-- Description -->
+    <textarea id="description" placeholder="Description" rows="3" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%; margin-top: 10px;"></textarea>
+
+    <!-- Your Email Address -->
+    <input type="email" id="email" placeholder="Your Email Address" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%; margin-top: 10px;" />
+
+    <!-- Submit Button -->
+    <button onclick="submitReport()" style="background: #007BFF; color: white; border: none; border-radius: 4px; padding: 10px; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%;">Submit</button>
+  </div>
+
+  <script>
+    // Initialize the map with a dark theme
+    const map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Move zoom controls to the bottom-right corner
+    map.zoomControl.setPosition('bottomright');
+
+    // Define colors for each issue type
+    const issueColors = {
+      rumor: 'orange', // Orange for Rumor
+      hateSpeech: 'red' // Red for Hate Speech
+    };
+
+    // Function to add a marker to the map
+    function addMarker(lat, lon, issueType, description) {
+      const color = issueColors[issueType] || 'gray'; // Default to gray if issueType is not defined
+      L.circle([lat, lon], {
+        color, // Use the color based on issue type
+        fillColor: color,
+        fillOpacity: 0.5,
+        radius: 50000
+      })
+      .addTo(map)
+      .bindPopup(`<strong>${issueType.toUpperCase()}</strong><br>${description}`);
+    }
+
+    // Function to handle form submission
+    function submitReport() {
+      const issueType = document.getElementById('issueType').value;
+      const subType = document.getElementById('subType').value;
+      const location = document.getElementById('location').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const email = document.getElementById('email').value.trim();
+
+      if (!issueType || !subType || !location || !description || !email) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=33bc15e34bc44677836917ce771d2a55`)
+        .then(response => response.json())
+        .then(data => {
+          const geo = data.results[0]?.geometry;
+          if (!geo) {
+            alert("Could not find the location.");
+            return;
+          }
+
+          const report = {
+            issueType,
+            subType,
+            location,
+            description,
+            email,
+            lat: geo.lat,
+            lon: geo.lng
+          };
+
+          // Save in localStorage
+          const reports = JSON.parse(localStorage.getItem("reports") || "[]");
+          reports.push(report);
+          localStorage.setItem("reports", JSON.stringify(reports));
+
+          // Show on map (without email)
+          addMarker(geo.lat, geo.lng, issueType, description);
+
+          // Clear form
+          document.getElementById('issueType').value = '';
+          document.getElementById('subType').value = '';
+          document.getElementById('location').value = '';
+          document.getElementById('description').value = '';
+          document.getElementById('email').value = '';
+        });
+    }
+
+    function showSuggestions() {
+      const query = document.getElementById('searchLocation').value.trim();
+      const suggestionsList = document.getElementById('suggestions');
+
+      if (!query) {
+        suggestionsList.style.display = 'none';
+        return;
+      }
+
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=33bc15e34bc44677836917ce771d2a55&limit=5`)
+        .then(response => response.json())
+        .then(data => {
+          const suggestions = data.results.map(result => result.formatted);
+          suggestionsList.innerHTML = '';
+
+          if (suggestions.length > 0) {
+            suggestions.forEach(suggestion => {
+              const li = document.createElement('li');
+              li.textContent = suggestion;
+              li.style.padding = '10px';
+              li.style.cursor = 'pointer';
+              li.addEventListener('click', () => {
+                document.getElementById('searchLocation').value = suggestion;
+                suggestionsList.style.display = 'none';
+              });
+              suggestionsList.appendChild(li);
+            });
+            suggestionsList.style.display = 'block';
+          } else {
+            suggestionsList.style.display = 'none';
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching suggestions:', err);
+          suggestionsList.style.display = 'none';
+        });
+    }
+
+    function searchLocation() {
+      const searchQuery = document.getElementById('searchLocation').value.trim();
+      if (!searchQuery) {
+        alert('Please enter a location to search.');
+        return;
+      }
+
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(searchQuery)}&key=33bc15e34bc44677836917ce771d2a55`)
+        .then(response => response.json())
+        .then(data => {
+          const geo = data.results[0]?.geometry;
+          if (!geo) {
+            alert('Could not find the location.');
+            return;
+          }
+
+          // Center the map on the searched location
+          map.setView([geo.lat, geo.lng], 10);
+        })
+        .catch(err => {
+          console.error('Error searching location:', err);
+          alert('An error occurred while searching for the location.');
+        });
+    }
+
+    function showLocationSuggestions() {
+      const query = document.getElementById('location').value.trim();
+      const suggestionsList = document.getElementById('locationSuggestions');
+
+      if (!query) {
+        suggestionsList.style.display = 'none';
+        return;
+      }
+
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=33bc15e34bc44677836917ce771d2a55&limit=5`)
+        .then(response => response.json())
+        .then(data => {
+          const suggestions = data.results.map(result => result.formatted);
+          suggestionsList.innerHTML = '';
+
+          if (suggestions.length > 0) {
+            suggestions.forEach(suggestion => {
+              const li = document.createElement('li');
+              li.textContent = suggestion;
+              li.style.padding = '10px';
+              li.style.cursor = 'pointer';
+              li.addEventListener('click', () => {
+                document.getElementById('location').value = suggestion;
+                suggestionsList.style.display = 'none';
+              });
+              suggestionsList.appendChild(li);
+            });
+            suggestionsList.style.display = 'block';
+          } else {
+            suggestionsList.style.display = 'none';
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching location suggestions:', err);
+          suggestionsList.style.display = 'none';
+        });
+    }
+
+    // On page load, load saved reports
+    const reports = JSON.parse(localStorage.getItem("reports") || "[]");
+    reports.forEach(r => addMarker(r.lat, r.lon, `${r.issueType} - ${r.subType}`, r.description));
+  </script>
+</body>
+</html>
+
