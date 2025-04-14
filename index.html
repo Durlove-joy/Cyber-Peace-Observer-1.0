@@ -83,6 +83,71 @@
     #form button:hover {
       background: #0056b3;
     }
+
+    /* Ensure the map takes full width and height on mobile */
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Adjust the title for smaller screens */
+    #title {
+      font-size: 18px; /* Smaller font size for mobile */
+      padding: 5px 0;
+    }
+
+    /* Adjust the search box for mobile */
+    #search {
+      top: 10px;
+      right: 10px;
+      width: auto;
+      padding: 5px;
+    }
+
+    #search input {
+      width: 150px; /* Smaller width for mobile */
+      font-size: 12px;
+    }
+
+    #search button {
+      font-size: 12px;
+      padding: 5px;
+    }
+
+    /* Adjust the suggestion box for mobile */
+    #suggestions {
+      width: 150px; /* Match the input width */
+    }
+
+    /* General mobile styles */
+    @media (max-width: 768px) {
+      #title {
+        font-size: 16px;
+      }
+
+      #search input {
+        width: 100%; /* Full width on mobile */
+      }
+
+      #search button {
+        width: 100%; /* Full width on mobile */
+      }
+
+      #form {
+        flex-direction: column; /* Stack form elements vertically */
+        align-items: stretch;
+        width: 100%; /* Full width on mobile */
+      }
+
+      #form input, #form select, #form textarea, #form button {
+        font-size: 14px; /* Slightly larger font for better readability */
+        width: 100%; /* Full width for all form elements */
+      }
+
+      #form textarea {
+        height: 50px; /* Adjust height for better usability */
+      }
+    }
   </style>
 </head>
 <body>
