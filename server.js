@@ -197,12 +197,7 @@ function submitReport() {
 
   // Call the backend API to get geocode data
   fetch(`/api/geocode?query=${encodeURIComponent(location)}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch geocode data');
-      }
-      return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
       const geo = data.results[0]?.geometry;
       if (!geo) {

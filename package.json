@@ -3,16 +3,31 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
+    "axios": "^1.8.4",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "mongoose": "^8.13.2",
     "node-fetch": "^3.3.2"
-  }
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/express": "^5.0.1",
+    "typescript": "^5.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Durlove-joy/Cyber-Peace-Observer-1.0.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Durlove-joy/Cyber-Peace-Observer-1.0/issues"
+  },
+  "homepage": "https://github.com/Durlove-joy/Cyber-Peace-Observer-1.0#readme",
+  "description": ""
 }

@@ -271,29 +271,29 @@
         });
     }
 
-    function searchLocation() {
-      const searchQuery = document.getElementById('searchLocation').value.trim();
-      if (!searchQuery) {
-        alert('Please enter a location to search.');
-        return;
-      }
-
-      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(searchQuery)}&key=33bc15e34bc44677836917ce771d2a55`)
-        .then(response => response.json())
-        .then(data => {
-          const geo = data.results[0]?.geometry;
-          if (!geo) {
-            alert('Could not find the location.');
+    async function searchLocation() {
+        const location = document.getElementById('searchLocation').value.trim();
+        if (!location) {
+            alert('Please enter a location to search.');
             return;
-          }
+        }
 
-          // Center the map on the searched location
-          map.setView([geo.lat, geo.lng], 10);
-        })
-        .catch(err => {
-          console.error('Error searching location:', err);
-          alert('An error occurred while searching for the location.');
-        });
+        fetch(`/api/geocode?query=${encodeURIComponent(location)}`)
+            .then(response => response.json())
+            .then(data => {
+                const geo = data.results[0]?.geometry;
+                if (!geo) {
+                    alert('Could not find the location.');
+                    return;
+                }
+
+                // Center the map on the searched location
+                map.setView([geo.lat, geo.lng], 10);
+            })
+            .catch(err => {
+                console.error('Error fetching geocode data:', err);
+                alert('An error occurred while searching for the location.');
+            });
     }
 
     function showLocationSuggestions() {

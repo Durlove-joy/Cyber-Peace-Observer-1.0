@@ -12,8 +12,15 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Check if MONGO_URI is defined
+if (!process.env.MONGO_URI) {
+  console.error('MONGO_URI is not defined in the .env file');
+  process.exit(1);
+}
+
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI as string, {
+console.log('Connecting to MongoDB with URI:', process.env.MONGO_URI);
+mongoose.connect(process.env.MONGO_URI as string, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -25,9 +32,18 @@ mongoose.connect(process.env.MONGODB_URI as string, {
 });
 
 // Routes
-app.use('/api/issues', issueRoutes());
+app.use('/api/issues', issueRoutes);
+
+// Fallback route for 404 errors
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Route not found' });
+});
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+try {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+} catch (error) {
+  console.error('Error starting the server:', error);
+}
