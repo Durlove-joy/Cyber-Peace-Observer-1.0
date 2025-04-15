@@ -161,42 +161,7 @@
     <input type="text" id="searchLocation" placeholder="Search Location" style="padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; width: 200px;" oninput="showSuggestions()" />
     <button onclick="searchLocation()" style="padding: 10px; font-size: 14px; background: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
     <ul id="suggestions" style="list-style: none; margin: 0; padding: 0; background: rgba(255, 255, 255, 0.9); border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto; display: none; position: absolute; top: 50px; right: 10px; z-index: 1001; width: 200px;"></ul>
-  </div>
-
-  <!-- Location Input with Suggestions -->
-  <div id="form" style="background: rgba(255, 255, 255, 0.3);">
-    <h2 style="text-align: center; margin-bottom: 10px;">Report an Issue</h2>
-    <!-- Issue Type -->
-    <select id="issueType" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%;">
-      <option value="" disabled selected>Select Issue Type</option>
-      <option value="rumor">Rumor</option>
-      <option value="hateSpeech">Hate Speech</option>
-    </select>
-
-    <!-- Additional Type Section -->
-    <select id="subType" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%; margin-top: 10px;">
-      <option value="" disabled selected>Select a Type</option>
-      <option value="political">Political</option>
-      <option value="religious">Religious</option>
-      <option value="community">Community</option>
-      <option value="others">Others</option>
-    </select>
-
-    <!-- Location -->
-    <div style="position: relative;">
-      <input type="text" id="location" placeholder="Location (e.g., City)" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%; margin-top: 10px;" oninput="showLocationSuggestions()" />
-      <ul id="locationSuggestions" style="list-style: none; margin: 0; padding: 0; background: rgba(255, 255, 255, 0.9); border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto; display: none; position: absolute; top: 100%; left: 0; width: 100%; z-index: 1001;"></ul>
-    </div>
-
-    <!-- Description -->
-    <textarea id="description" placeholder="Description" rows="3" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%; margin-top: 10px;"></textarea>
-
-    <!-- Your Email Address -->
-    <input type="email" id="email" placeholder="Your Email Address" required style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; width: 100%; margin-top: 10px;" />
-
-    <!-- Submit Button -->
-    <button onclick="submitReport()" style="background: #007BFF; color: white; border: none; border-radius: 4px; padding: 10px; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%;">Submit</button>
-  </div>
+    <script src="https://sheetdb.io/s/f/sipyg3cuhvo6f.js"></script>
 
   <script>
     // Initialize EmailJS

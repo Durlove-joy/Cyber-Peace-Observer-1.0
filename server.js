@@ -2,6 +2,7 @@ require('dotenv').config(); // Load environment variables from .env
 const express = require('express');
 const fetch = require('node-fetch');
 const mongoose = require('mongoose');
+const axios = require('axios');
 const app = express();
 
 const OPEN_CAGE_API_KEY = process.env.OPEN_CAGE_API_KEY; // Access the API key from .env
@@ -15,7 +16,6 @@ mongoose.connect('mongodb://localhost:27017/cyberpeace', { useNewUrlParser: true
 const reportSchema = new mongoose.Schema({
   issueType: String,
   subType: String,
-  location: String,
   description: String,
   email: String,
   lat: Number,
@@ -237,7 +237,7 @@ function submitReport() {
 }
 
 // On page load, load saved reports from the backend
-fetch('/api/reports')
+fetch('http://localhost:3000/api/reports') // Use the full URL for the API
   .then(response => response.json())
   .then(reports => {
     reports.forEach(r => addMarker(r.lat, r.lon, `${r.issueType} - ${r.subType}`, r.description));
