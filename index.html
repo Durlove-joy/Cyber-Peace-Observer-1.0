@@ -190,15 +190,21 @@
 
     // Function to add a marker to the map
     function addMarker(lat, lon, issueType, description) {
+      const issueColors = {
+        rumor: 'orange', // Orange for Rumor
+        hateSpeech: 'red' // Red for Hate Speech
+      };
+
       const color = issueColors[issueType] || 'gray'; // Default to gray if issueType is not defined
+
       L.circle([lat, lon], {
         color, // Use the color based on issue type
         fillColor: color,
         fillOpacity: 0.5,
-        radius: 50000
+        radius: 50000 // Adjust radius as needed
       })
-      .addTo(map)
-      .bindPopup(`<strong>${issueType.toUpperCase()}</strong><br>${description}`);
+        .addTo(map)
+        .bindPopup(`<strong>${issueType.toUpperCase()}</strong><br>${description}`);
     }
 
     // Function to handle form submission
@@ -378,6 +384,30 @@
       const newZoom = isMobile ? 3 : 2;
       map.setZoom(newZoom); // Dynamically adjust the zoom level
     });
+
+    // Function to fetch data from SheetDB and display it on the map
+    async function loadReportsFromSheetDB() {
+      try {
+        // Fetch data from SheetDB
+        const response = await fetch('https://sheetdb.io/api/v1/nu0qrwehdnl5p');
+        const reports = await response.json();
+
+        // Loop through the reports and add markers to the map
+        reports.forEach(report => {
+          const { lat, lon, issueType, description } = report;
+
+          // Ensure latitude and longitude are valid
+          if (lat && lon) {
+            addMarker(parseFloat(lat), parseFloat(lon), issueType, description);
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching data from SheetDB:', error);
+      }
+    }
+
+    // Call the function to load reports on page load
+    loadReportsFromSheetDB();
   </script>
 </body>
 </html>
