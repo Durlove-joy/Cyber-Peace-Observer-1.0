@@ -3,13 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>Cyber Peace Observer</title>
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
   <style>
+    /* Same CSS styles as before */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -17,146 +14,114 @@
       display: flex;
       flex-direction: column;
     }
-
     #map {
       position: absolute;
-      top: 0; /* Start the map from the top */
+      top: 0;
       left: 0;
       width: 100%;
-      height: 100%; /* Full height of the viewport */
-      z-index: 0; /* Base layer */
+      height: 100%;
+      z-index: 0;
     }
-
     .leaflet-control {
-      z-index: 1500; /* Ensure map controls are above all other elements */
+      z-index: 1500;
     }
-
     #title {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      background: rgba(0, 0, 0, 0.5); /* Transparent black background */
+      background: rgba(0, 0, 0, 0.5);
       color: white;
       text-align: center;
       padding: 10px 0;
-      z-index: 1500; /* Ensure the title is above the map */
+      z-index: 1500;
       font-size: 24px;
       font-weight: bold;
     }
-
     #form {
       position: absolute;
       bottom: 10px;
       left: 10px;
-      background: rgba(255, 255, 255, 0.3); /* Transparent white background */
-      padding: 15px; /* Reduced padding */
+      background: rgba(255, 255, 255, 0.3);
+      padding: 15px;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      z-index: 1000; /* Form layer */
+      z-index: 1000;
       display: flex;
       flex-direction: column;
-      gap: 8px; /* Reduced gap between elements */
-      width: 250px; /* Reduced width */
+      gap: 8px;
+      width: 250px;
     }
-
     #form input, #form select, #form textarea, #form button {
-      padding: 8px; /* Reduced padding */
-      font-size: 12px; /* Reduced font size */
+      padding: 8px;
+      font-size: 12px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      width: 100%; /* Ensure all elements take up the full width of the form */
-      box-sizing: border-box; /* Prevent padding from affecting width */
+      width: 100%;
+      box-sizing: border-box;
     }
-
     #form textarea {
-      resize: none; /* Prevent resizing of the textarea */
+      resize: none;
     }
-
     #form button {
       background: #007BFF;
       color: white;
       border: none;
       cursor: pointer;
     }
-
     #form button:hover {
       background: #0056b3;
     }
-
-    /* Ensure the map takes full width and height on mobile */
     #map {
       width: 100%;
       height: 100%;
     }
-
-    /* Adjust the title for smaller screens */
     #title {
-      font-size: 18px; /* Smaller font size for mobile */
+      font-size: 18px;
       padding: 5px 0;
     }
-
-    /* Adjust the search box for mobile */
     #search {
       top: 10px;
       right: 10px;
       width: auto;
       padding: 5px;
     }
-
     #search input {
-      width: 150px; /* Smaller width for mobile */
+      width: 150px;
       font-size: 12px;
     }
-
     #search button {
       font-size: 12px;
       padding: 5px;
     }
-
-    /* Adjust the suggestion box for mobile */
     #suggestions {
-      width: 150px; /* Match the input width */
+      width: 150px;
     }
-
-    /* General mobile styles */
     @media (max-width: 768px) {
       #title {
         font-size: 16px;
       }
-
-      #search input {
-        width: 100%; /* Full width on mobile */
+      #search input, #search button {
+        width: 100%;
       }
-
-      #search button {
-        width: 100%; /* Full width on mobile */
-      }
-
       #form {
-        flex-direction: column; /* Stack form elements vertically */
+        flex-direction: column;
         align-items: stretch;
-        width: 100%; /* Full width on mobile */
+        width: 100%;
       }
-
       #form input, #form select, #form textarea, #form button {
-        font-size: 14px; /* Slightly larger font for better readability */
-        width: 100%; /* Full width for all form elements */
+        font-size: 14px;
+        width: 100%;
       }
-
       #form textarea {
-        height: 50px; /* Adjust height for better usability */
+        height: 50px;
       }
     }
   </style>
 </head>
 <body>
   <div id="map"></div>
-
-  <!-- Title -->
   <div id="title">Cyber Peace Observer</div>
-
-  <!-- Search Section -->
   <div id="search" style="position: absolute; top: 50px; right: 10px; z-index: 1000; background: rgba(255, 255, 255, 0.3); padding: 10px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
     <input type="text" id="searchLocation" placeholder="Search Location" style="padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; width: 200px;" oninput="showSuggestions()" />
     <button onclick="searchLocation()" style="padding: 10px; font-size: 14px; background: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
@@ -164,14 +129,10 @@
     <script src="https://sheetdb.io/s/f/gk4ag43gyg19l.js"></script>
 
   <script>
-    // Initialize EmailJS
-    emailjs.init("dzPDwAz4pdjkgezsx"); // Replace with your actual Public API key
+    const isMobile = window.innerWidth <= 768;
+    const initialZoom = isMobile ? 3 : 2;
 
-    // Initialize the map with a dynamic zoom level based on screen size
-    const isMobile = window.innerWidth <= 768; // Check if the device is mobile (width <= 768px)
-    const initialZoom = isMobile ? 3 : 2; // Use a higher zoom level for mobile devices
-
-    const map = L.map('map').setView([20, 0], initialZoom); // Set the initial zoom level dynamically
+    const map = L.map('map').setView([20, 0], initialZoom);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
@@ -179,35 +140,26 @@
       maxZoom: 19
     }).addTo(map);
 
-    // Move zoom controls to the bottom-right corner
     map.zoomControl.setPosition('bottomright');
 
-    // Define colors for each issue type
     const issueColors = {
-      rumor: 'orange', // Orange for Rumor
-      hateSpeech: 'red' // Red for Hate Speech
+      rumor: 'orange',
+      hateSpeech: 'red'
     };
 
-    // Function to add a marker to the map
     function addMarker(lat, lon, issueType, description) {
-      const issueColors = {
-        rumor: 'orange', // Orange for Rumor
-        hateSpeech: 'red' // Red for Hate Speech
-      };
-
-      const color = issueColors[issueType] || 'gray'; // Default to gray if issueType is not defined
+      const color = issueColors[issueType] || 'gray';
 
       L.circle([lat, lon], {
-        color, // Use the color based on issue type
+        color,
         fillColor: color,
         fillOpacity: 0.5,
-        radius: 50000 // Adjust radius as needed
+        radius: 50000
       })
         .addTo(map)
         .bindPopup(`<strong>${issueType.toUpperCase()}</strong><br>${description}`);
     }
 
-    // Function to handle form submission
     function submitReport() {
       const issueType = document.getElementById('issueType').value;
       const subType = document.getElementById('subType').value;
@@ -234,33 +186,19 @@
             subType,
             location,
             description,
-            email,
             lat: geo.lat,
             lon: geo.lng
           };
 
-          // Save in localStorage
           const reports = JSON.parse(localStorage.getItem("reports") || "[]");
           reports.push(report);
           localStorage.setItem("reports", JSON.stringify(reports));
 
-          // Show on map (without email)
           addMarker(geo.lat, geo.lng, issueType, description);
 
-          // Send email via EmailJS
-          emailjs.send("service_p91quwv", "template_ckurhki", {
-            issueType: report.issueType,
-            subType: report.subType,
-            location: report.location,
-            description: report.description,
-            email: report.email // Send the email address to the recipient
-          }).then((response) => {
-            console.log("Email sent successfully:", response);
-          }).catch((err) => {
-            console.error("Email failed to send:", err);
-          });
+          // EmailJS functionality removed
+          // MongoDB storage removed
 
-          // Clear form
           document.getElementById('issueType').value = '';
           document.getElementById('subType').value = '';
           document.getElementById('location').value = '';
@@ -308,106 +246,31 @@
     }
 
     async function searchLocation() {
-        const location = document.getElementById('searchLocation').value.trim();
-        if (!location) {
-            alert('Please enter a location to search.');
-            return;
-        }
-
-        fetch(`/api/geocode?query=${encodeURIComponent(location)}`)
-            .then(response => response.json())
-            .then(data => {
-                const geo = data.results[0]?.geometry;
-                if (!geo) {
-                    alert('Could not find the location.');
-                    return;
-                }
-
-                // Center the map on the searched location
-                map.setView([geo.lat, geo.lng], 10);
-            })
-            .catch(err => {
-                console.error('Error fetching geocode data:', err);
-                alert('An error occurred while searching for the location.');
-            });
-    }
-
-    function showLocationSuggestions() {
-      const query = document.getElementById('location').value.trim();
-      const suggestionsList = document.getElementById('locationSuggestions');
-
-      if (!query) {
-        suggestionsList.style.display = 'none';
+      const location = document.getElementById('searchLocation').value.trim();
+      if (!location) {
+        alert('Please enter a location to search.');
         return;
       }
 
-      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=33bc15e34bc44677836917ce771d2a55&limit=5`)
+      fetch(`/api/geocode?query=${encodeURIComponent(location)}`)
         .then(response => response.json())
         .then(data => {
-          const suggestions = data.results.map(result => result.formatted);
-          suggestionsList.innerHTML = '';
-
-          if (suggestions.length > 0) {
-            suggestions.forEach(suggestion => {
-              const li = document.createElement('li');
-              li.textContent = suggestion;
-              li.style.padding = '10px';
-              li.style.cursor = 'pointer';
-              li.addEventListener('click', () => {
-                document.getElementById('location').value = suggestion;
-                suggestionsList.style.display = 'none';
-              });
-              suggestionsList.appendChild(li);
-            });
-            suggestionsList.style.display = 'block';
-          } else {
-            suggestionsList.style.display = 'none';
+          const geo = data.results[0]?.geometry;
+          if (!geo) {
+            alert('Could not find the location.');
+            return;
           }
+
+          map.setView([geo.lat, geo.lng], 10);
         })
         .catch(err => {
-          console.error('Error fetching location suggestions:', err);
-          suggestionsList.style.display = 'none';
+          console.error('Error fetching geocode data:', err);
+          alert('An error occurred while searching for the location.');
         });
     }
 
-    // On page load, load saved reports
     const reports = JSON.parse(localStorage.getItem("reports") || "[]");
     reports.forEach(r => addMarker(r.lat, r.lon, `${r.issueType} - ${r.subType}`, r.description));
-
-    // Example fetch call
-    fetch('/api/geocode?query=location')
-      .then(response => response.json())
-      .then(data => console.log(data));
-
-    window.addEventListener('resize', () => {
-      const isMobile = window.innerWidth <= 768;
-      const newZoom = isMobile ? 3 : 2;
-      map.setZoom(newZoom); // Dynamically adjust the zoom level
-    });
-
-    // Function to fetch data from SheetDB and display it on the map
-    async function loadReportsFromSheetDB() {
-      try {
-        // Fetch data from SheetDB
-        const response = await fetch('https://sheetdb.io/api/v1/gk4ag43gyg19l');
-        const reports = await response.json();
-
-        // Loop through the reports and add markers to the map
-        reports.forEach(report => {
-          const { lat, lon, issueType, description } = report;
-
-          // Ensure latitude and longitude are valid
-          if (lat && lon) {
-            addMarker(parseFloat(lat), parseFloat(lon), issueType, description);
-          }
-        });
-      } catch (error) {
-        console.error('Error fetching data from SheetDB:', error);
-      }
-    }
-
-    // Call the function to load reports on page load
-    loadReportsFromSheetDB();
   </script>
 </body>
 </html>
