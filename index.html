@@ -192,6 +192,7 @@
   <div class="content-section">
     <h1 style="text-align: center;">Report an Issue</h1>
     <div style="padding: 20px 40px;">
+      <script src="config.js"></script>
       <script src="https://sheetdb.io/s/f/gk4ag43gyg19l.js"></script>
     </div>
   </div>
@@ -203,7 +204,7 @@
   <script>
     // Initialize DataTable
     new DataTable('#example', {
-      ajax: 'https://script.google.com/macros/s/AKfycbwmcens5pwcDr1SiiVPhJX9itVRTmkQG4l_7-hN4SRmTDCQplrjVQ6yyUFm0L3qlGUz/exec',
+      ajax: config.GOOGLE_SHEETS_API_URL,
       columns: [
         { data: 'Type' },
         { data: 'Catagory' },
@@ -241,7 +242,7 @@
         color,
         fillColor: color,
         fillOpacity: 0.5,
-        radius: 50000
+        radius: 10000
       })
         .addTo(map)
         .bindPopup(`<strong>${issueType.toUpperCase()}</strong><br>${description}`);
@@ -259,7 +260,7 @@
         return;
       }
 
-      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=33bc15e34bc44677836917ce771d2a55`)
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${config.OPENCAGE_API_KEY}`)
         .then(response => response.json())
         .then(data => {
           const geo = data.results[0]?.geometry;
@@ -283,9 +284,6 @@
 
           addMarker(geo.lat, geo.lng, issueType, description);
 
-          // EmailJS functionality removed
-          // MongoDB storage removed
-
           document.getElementById('issueType').value = '';
           document.getElementById('subType').value = '';
           document.getElementById('location').value = '';
@@ -303,7 +301,7 @@
         return;
       }
 
-      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=33bc15e34bc44677836917ce771d2a55&limit=5`)
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=${config.OPENCAGE_API_KEY}&limit=5`)
         .then(response => response.json())
         .then(data => {
           const suggestions = data.results.map(result => result.formatted);
@@ -339,21 +337,20 @@
         return;
       }
 
-      fetch(`/api/geocode?query=${encodeURIComponent(location)}`)
-        .then(response => response.json())
-        .then(data => {
-          const geo = data.results[0]?.geometry;
-          if (!geo) {
-            alert('Could not find the location.');
-            return;
-          }
-
+      try {
+        const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${config.OPENCAGE_API_KEY}`);
+        const data = await response.json();
+        
+        if (data.results && data.results.length > 0) {
+          const geo = data.results[0].geometry;
           map.setView([geo.lat, geo.lng], 10);
-        })
-        .catch(err => {
-          console.error('Error fetching geocode data:', err);
-          alert('An error occurred while searching for the location.');
-        });
+        } else {
+          alert('Could not find the location.');
+        }
+      } catch (err) {
+        console.error('Error fetching geocode data:', err);
+        alert('An error occurred while searching for the location.');
+      }
     }
 
     const reports = JSON.parse(localStorage.getItem("reports") || "[]");
@@ -388,7 +385,7 @@
   
                 // Create circle on map
                 L.circle([lat, lng], {
-                  radius: 50000, // Adjust as needed
+                  radius: 10000, // Adjust as needed
                   color: categoryColors[category] || "gray",
                   fillColor: categoryColors[category] || "gray",
                   fillOpacity: 0.6
@@ -424,7 +421,7 @@
                 const { lat, lng } = geoData.results[0].geometry;
     
                 L.circle([lat, lng], {
-                  radius: 50000,
+                  radius: 10000,
                   color: color,
                   fillColor: color,
                   fillOpacity: 0.6
@@ -472,7 +469,7 @@
                 if (result && result.geometry) {
                   const { lat, lng } = result.geometry;
                   L.circle([lat, lng], {
-                    radius: 50000,
+                    radius: 10000,
                     color: color,
                     fillColor: color,
                     fillOpacity: 0.6
