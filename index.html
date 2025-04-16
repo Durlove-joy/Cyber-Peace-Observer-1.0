@@ -289,7 +289,7 @@
 
   <div class="content-section">
     <h1 style="text-align: center;">Report an Issue</h1>
-    <div style="padding: 20px 40px;">
+    <div style="padding: 20px 40px; width: 100%;">
       <script src="config.js"></script>
       <script src="https://sheetdb.io/s/f/gk4ag43gyg19l.js"></script>
     </div>
@@ -328,6 +328,21 @@
       footer p {
         margin: 5px 0;
         font-size: 12px;
+      }
+    }
+    @media (max-width: 768px) {
+      .content-section {
+        padding: 10px;
+      }
+      .content-section > div {
+        padding: 20px !important;
+        width: 100% !important;
+      }
+    }
+    @media (min-width: 769px) {
+      .content-section > div {
+        padding: 20px 40px !important;
+        width: 100% !important;
       }
     }
   </style>
