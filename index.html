@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Cyber Peace Observer</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <style>
     /* Same CSS styles as before */
@@ -118,6 +119,7 @@
       }
     }
   </style>
+  
 </head>
 <body>
   <div id="map"></div>
@@ -126,6 +128,7 @@
     <input type="text" id="searchLocation" placeholder="Search Location" style="padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; width: 200px;" oninput="showSuggestions()" />
     <button onclick="searchLocation()" style="padding: 10px; font-size: 14px; background: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
     <ul id="suggestions" style="list-style: none; margin: 0; padding: 0; background: rgba(255, 255, 255, 0.9); border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto; display: none; position: absolute; top: 50px; right: 10px; z-index: 1001; width: 200px;"></ul>
+
     <script src="https://sheetdb.io/s/f/gk4ag43gyg19l.js"></script>
 
   <script>
@@ -272,6 +275,165 @@
     const reports = JSON.parse(localStorage.getItem("reports") || "[]");
     reports.forEach(r => addMarker(r.lat, r.lon, `${r.issueType} - ${r.subType}`, r.description));
   </script>
+  <script>
+    // Replace with your actual script URL
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwmcens5pwcDr1SiiVPhJX9itVRTmkQG4l_7-hN4SRmTDCQplrjVQ6yyUFm0L3qlGUz/exec";
+    const opencageApiKey = "33bc15e34bc44677836917ce771d2a55"; // Replace with your OpenCageData API key
+  
+    const categoryColors = {
+      political: "red",
+      religious: "blue",
+      ethnic: "green",
+      other: "orange"
+    };
+  
+    // Fetch the spreadsheet data
+    fetch(scriptURL)
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(entry => {
+          const locationName = entry.location;
+          const category = entry.category.toLowerCase();
+  
+          // Geocode the location
+          fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${opencageApiKey}`)
+            .then(res => res.json())
+            .then(geoData => {
+              if (geoData.results.length > 0) {
+                const { lat, lng } = geoData.results[0].geometry;
+  
+                // Create circle on map
+                L.circle([lat, lng], {
+                  radius: 50000, // Adjust as needed
+                  color: categoryColors[category] || "gray",
+                  fillColor: categoryColors[category] || "gray",
+                  fillOpacity: 0.6
+                }).addTo(map)
+                .bindPopup(`<strong>Category:</strong> ${category}<br><strong>Location:</strong> ${locationName}`);
+              }
+            });
+        });
+      })
+      .catch(error => console.error("Error loading data:", error));
+  </script><br>
+  <body style="padding: 20px 40px;">
+	  <h1>Report an Issues</h1>
+		<table id="example" class="display" style="width:100%">
+			<thead>
+				<tr>
+					<th>Type</th>
+					<th>Catagory</th>
+					<th>To The Location</th>
+					<th>From The LOcation</th>
+          <th>Date and Time</th>
+          <th>Description</th>
+					<!-- Add more columns as needed based on your JSON structure-->
+				</tr>
+			</thead>
+		
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+  <script>
+    new DataTable('#example', {
+      ajax: 'https://script.google.com/macros/s/AKfycbwmcens5pwcDr1SiiVPhJX9itVRTmkQG4l_7-hN4SRmTDCQplrjVQ6yyUFm0L3qlGUz/exec',
+      columns: [
+        { data: 'Type' },
+        { data: 'Catagory' },
+        { data: 'To The Location' },
+        { data: 'From The Location' },
+        { data: 'Date and Time' },
+        { data: 'Description' }
+    ]
+    });
+  </script>
+  <script>
+    const activityColors = {
+      "VIOLENT ACTIVITY": "red",
+      "RUMOR": "yellow",
+      "HATE SPEECH": "orange"
+    };
+    
+    fetch("https://script.google.com/macros/s/AKfycbwmcens5pwcDr1SiiVPhJX9itVRTmkQG4l_7-hN4SRmTDCQplrjVQ6yyUFm0L3qlGUz/exec")
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(entry => {
+          const locationName = entry["To The Location"];
+          const type = entry["Type"]?.trim().toUpperCase();
+          const description = entry["Description"];
+    
+          const color = activityColors[type] || "gray"; // default to gray if type is unknown
+    
+          fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=33bc15e34bc44677836917ce771d2a55`)
+            .then(res => res.json())
+            .then(geoData => {
+              if (geoData.results.length > 0) {
+                const { lat, lng } = geoData.results[0].geometry;
+    
+                L.circle([lat, lng], {
+                  radius: 50000,
+                  color: color,
+                  fillColor: color,
+                  fillOpacity: 0.6
+                }).addTo(map)
+                  .bindPopup(
+                    `<strong>Type:</strong> ${type}<br>
+                     <strong>Location:</strong> ${locationName}<br>
+                     <strong>Description:</strong> ${description}`
+                  );
+              }
+            });
+        });
+      })
+      .catch(err => console.error("Failed to load external data:", err));
+    </script>
+    
+
+    <script>
+      const opencageKey = "33bc15e34bc44677836917ce771d2a55";
+      
+      // Define color mapping based on report type
+      const typeColors = {
+        "VIOLENT ACTIVITY": "red",
+        "RUMOR": "yellow",
+        "HATE SPEECH": "orange"
+      };
+    
+      // Wait for the table to load its data
+      $('#example').on('xhr.dt', function (e, settings, json, xhr) {
+        if (json && Array.isArray(json.data)) {
+          json.data.forEach(row => {
+            const toLocation = row["To The Location"];
+            const reportType = row["Type"]?.toUpperCase(); // Get type from the row
+            
+            // Skip if no location or type
+            if (!toLocation || !reportType) return;
+    
+            // Get color from mapping or default to gray
+            const color = typeColors[reportType] || "gray";
+    
+            fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(toLocation)}&key=${opencageKey}`)
+              .then(res => res.json())
+              .then(geoData => {
+                const result = geoData.results[0];
+                if (result && result.geometry) {
+                  const { lat, lng } = result.geometry;
+                  L.circle([lat, lng], {
+                    radius: 50000,
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.6
+                  }).addTo(map)
+                  .bindPopup(`
+                    <strong>Type:</strong> ${reportType}<br>
+                    <strong>Location:</strong> ${toLocation}
+                  `);
+                }
+              })
+              .catch(err => console.error("Geocoding error:", err));
+          });
+        }
+      });
+    </script>
 </body>
 </html>
-
