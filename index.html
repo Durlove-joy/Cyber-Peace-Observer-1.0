@@ -91,10 +91,12 @@
       margin-top: 20px;
       margin-bottom: 20px;
       color: #333;
+      font-size: 24px;
     }
     .content-section h2 {
       margin-bottom: 20px;
       color: #444;
+      font-size: 20px;
     }
     .form-section {
       background: #f8f9fa;
@@ -141,7 +143,28 @@
     #example {
       width: 100%;
       margin-top: 20px;
+      overflow-x: auto;
     }
+    .dataTables_wrapper {
+      overflow-x: auto;
+    }
+    footer {
+      background-color: #f8f9fa;
+      padding: 20px;
+      margin-top: 40px;
+      border-top: 1px solid #dee2e6;
+    }
+    footer a {
+      color: #333;
+      text-decoration: none;
+      margin: 0 10px;
+      display: inline-block;
+    }
+    footer a:hover {
+      color: #007BFF;
+    }
+
+    /* Mobile Responsive Styles */
     @media (max-width: 768px) {
       #map {
         height: 300px;
@@ -152,6 +175,7 @@
         right: 0;
         margin: 10px;
         width: auto;
+        background: white;
       }
       #search input {
         width: 100%;
@@ -160,6 +184,80 @@
       #search button {
         width: 100%;
         margin-left: 0;
+      }
+      .content-section {
+        padding: 10px;
+      }
+      .content-section h1 {
+        font-size: 20px;
+        margin: 15px 0;
+      }
+      .content-section h2 {
+        font-size: 18px;
+      }
+      .form-section {
+        padding: 15px;
+      }
+      footer {
+        padding: 15px;
+      }
+      footer a {
+        display: block;
+        margin: 5px 0;
+        text-align: center;
+        font-size: 14px;
+      }
+      footer p {
+        margin: 5px 0;
+        font-size: 12px;
+      }
+      .dataTables_wrapper .dataTables_length,
+      .dataTables_wrapper .dataTables_filter {
+        text-align: left;
+        margin-bottom: 10px;
+      }
+      .dataTables_wrapper .dataTables_info,
+      .dataTables_wrapper .dataTables_paginate {
+        text-align: center;
+      }
+      table.dataTable {
+        font-size: 14px;
+      }
+      table.dataTable thead th {
+        padding: 8px;
+        font-size: 14px;
+      }
+      table.dataTable tbody td {
+        padding: 8px;
+        font-size: 14px;
+      }
+    }
+
+    /* Small Mobile Devices */
+    @media (max-width: 480px) {
+      #title {
+        font-size: 20px;
+        padding: 10px 0;
+      }
+      #map {
+        height: 250px;
+      }
+      .content-section h1 {
+        font-size: 18px;
+      }
+      .content-section h2 {
+        font-size: 16px;
+      }
+      table.dataTable {
+        font-size: 12px;
+      }
+      table.dataTable thead th {
+        padding: 6px;
+        font-size: 12px;
+      }
+      table.dataTable tbody td {
+        padding: 6px;
+        font-size: 12px;
       }
     }
   </style>
@@ -199,19 +297,16 @@
 
   <footer style="background-color: #f8f9fa; padding: 20px; margin-top: 40px; border-top: 1px solid #dee2e6;">
     <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
-      <div style="margin-bottom: 15px;">
-        <a href="#" style="color: #333; text-decoration: none; margin: 0 10px;">Home</a>
-        <a href="#" style="color: #333; text-decoration: none; margin: 0 10px;">About</a>
-        <a href="#" style="color: #333; text-decoration: none; margin: 0 10px;">Contact</a>
-        <a href="#" style="color: #333; text-decoration: none; margin: 0 10px;">Privacy Policy</a>
-        <a href="#" style="color: #333; text-decoration: none; margin: 0 10px;">Terms of Service</a>
+      <div style="margin-bottom: 10px;">
+        <a href="index.html" style="color: #333; text-decoration: none; margin: 0 10px;">Home</a>
+        <a href="about.html" style="color: #333; text-decoration: none; margin: 0 10px;">About</a>
+        <a href="mailto:cyberpeaceobserver@gmail.com" style="color: #333; text-decoration: none; margin: 0 10px;">Contact</a>
+        <a href="privacy-policy.html" style="color: #333; text-decoration: none; margin: 0 10px;">Privacy Policy</a>
+        <a href="terms.html" style="color: #333; text-decoration: none; margin: 0 10px;">Terms of Service</a>
       </div>
-      <div style="color: #666; margin-bottom: 15px;">
+      <div style="color: #666; margin-bottom: 10px; font-size: 14px;">
         <p>© 2024 Cyber Peace Observer. All rights reserved.</p>
-        <p>This platform is designed to monitor and report cyber peace issues worldwide.</p>
-      </div>
-      <div style="color: #333; font-weight: bold;">
-        <p>Developed By Durlove Sarker Joy</p>
+        <p style="font-size: 12px;">Developed By Durlove Sarker Joy</p>
       </div>
     </div>
   </footer>
@@ -226,7 +321,13 @@
       }
       footer a {
         display: block;
-        margin: 5px 0 !important;
+        margin: 5px 0;
+        text-align: center;
+        font-size: 14px;
+      }
+      footer p {
+        margin: 5px 0;
+        font-size: 12px;
       }
     }
   </style>
