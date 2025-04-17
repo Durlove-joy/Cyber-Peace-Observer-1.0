@@ -36,51 +36,62 @@
     .leaflet-control {
       z-index: 1000;
     }
+    #filter-buttons {
+      position: absolute;
+      top: 70px;
+      left: 20px;
+      z-index: 1000;
+      background: none;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: none;
+      border: none;
+    }
     #search {
       position: absolute;
       top: 90px;
       right: 20px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
+      background: none;
       padding: 15px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: none;
+      border: none;
     }
     #search input {
       padding: 10px 15px;
       font-size: 14px;
-      border: 1px solid #ddd;
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 6px;
       width: 250px;
       transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
     }
-    #search input:focus {
-      border-color: #1a237e;
-      box-shadow: 0 0 5px rgba(26,35,126,0.2);
-      outline: none;
+    #search input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
     }
     #search button {
       padding: 10px 20px;
       font-size: 14px;
-      background: linear-gradient(135deg, #1a237e, #0d47a1);
+      background: rgba(255, 255, 255, 0.2);
       color: white;
-      border: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 6px;
       cursor: pointer;
       margin-left: 10px;
       transition: all 0.3s ease;
     }
     #search button:hover {
-      background: linear-gradient(135deg, #0d47a1, #1a237e);
+      background: rgba(255, 255, 255, 0.3);
       transform: translateY(-1px);
     }
     #suggestions {
       list-style: none;
       margin: 0;
       padding: 0;
-      background: white;
-      border: 1px solid #ccc;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 4px;
       max-height: 150px;
       overflow-y: auto;
@@ -94,9 +105,26 @@
     #suggestions li {
       padding: 8px;
       cursor: pointer;
+      color: white;
     }
     #suggestions li:hover {
-      background-color: #f0f0f0;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    #filter-buttons label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+    #filter-buttons input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    #filter-buttons span {
+      padding: 8px 15px;
+      border-radius: 6px;
+      width: 100%;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
     .content-section {
       padding: 20px;
@@ -349,6 +377,23 @@
 </head>
 <body>
   <div id="title">Cyber Peace Observer</div>
+  <div id="filter-buttons">
+    <div style="margin-bottom: 10px; font-weight: bold; color: #e3e4eb;">Filter by Activity Type:</div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <label style="display: flex; align-items: center; cursor: pointer;">
+        <input type="checkbox" id="rumor-checkbox" onchange="updateMarkers()" style="margin-right: 8px;">
+        <span style="background: #ffd700; color: #000; padding: 8px 15px; border-radius: 6px; width: 100%;">RUMOR</span>
+      </label>
+      <label style="display: flex; align-items: center; cursor: pointer;">
+        <input type="checkbox" id="hate-speech-checkbox" onchange="updateMarkers()" style="margin-right: 8px;">
+        <span style="background: #ffa500; color: #000; padding: 8px 15px; border-radius: 6px; width: 100%;">HATE SPEECH</span>
+      </label>
+      <label style="display: flex; align-items: center; cursor: pointer;">
+        <input type="checkbox" id="violent-activity-checkbox" onchange="updateMarkers()" style="margin-right: 8px;">
+        <span style="background: #ff0000; color: #fff; padding: 8px 15px; border-radius: 6px; width: 100%;">VIOLENT ACTIVITY</span>
+      </label>
+    </div>
+  </div>
   <div id="map"></div>
   <div id="search">
     <input type="text" id="searchLocation" placeholder="Search Location" oninput="showSuggestions()" />
@@ -380,7 +425,7 @@
 
       <div id="report-issue" class="tab-content">
         <script src="config.js"></script>
-        <script src="https://sheetdb.io/s/f/gk4ag43gyg19l.js"></script>
+    <script src="https://sheetdb.io/s/f/gk4ag43gyg19l.js"></script>
       </div>
     </div>
   </div>
@@ -457,68 +502,238 @@
 
     map.zoomControl.setPosition('bottomright');
 
-    const issueColors = {
-      rumor: 'orange',
-      hateSpeech: 'red'
+    let allMarkers = [];
+    let currentMarkers = [];
+    const activityColors = {
+      "VIOLENT ACTIVITY": "red",
+      "RUMOR": "yellow",
+      "HATE SPEECH": "orange"
     };
 
-    function addMarker(lat, lon, issueType, description) {
-      const color = issueColors[issueType] || 'gray';
-
-      L.circle([lat, lon], {
-        color,
-        fillColor: color,
-        fillOpacity: 0.5,
-        radius: 10000
-      })
-        .addTo(map)
-        .bindPopup(`<strong>${issueType.toUpperCase()}</strong><br>${description}`);
+    function addMarkerToMap(lat, lng, type, location, description) {
+      const marker = {
+        lat: lat,
+        lng: lng,
+        type: type,
+        location: location,
+        description: description
+      };
+      allMarkers.push(marker);
+      return marker;
     }
 
-    function submitReport() {
-      const issueType = document.getElementById('issueType').value;
-      const subType = document.getElementById('subType').value;
-      const location = document.getElementById('location').value.trim();
-      const description = document.getElementById('description').value.trim();
-      const email = document.getElementById('email').value.trim();
+    function getDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Earth's radius in kilometers
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
 
-      if (!issueType || !subType || !location || !description || !email) {
-        alert("Please fill in all fields.");
+    function findClusters(markers, maxDistance = 50) { // maxDistance in kilometers
+      const clusters = [];
+      const visited = new Set();
+
+      markers.forEach((marker, i) => {
+        if (visited.has(i)) return;
+
+        const cluster = [marker];
+        visited.add(i);
+
+        markers.forEach((otherMarker, j) => {
+          if (i === j || visited.has(j)) return;
+
+          const distance = getDistance(
+            marker.lat, marker.lng,
+            otherMarker.lat, otherMarker.lng
+          );
+
+          if (distance <= maxDistance) {
+            cluster.push(otherMarker);
+            visited.add(j);
+          }
+        });
+
+        if (cluster.length > 0) {
+          clusters.push(cluster);
+        }
+      });
+
+      return clusters;
+    }
+
+    function updateMarkers() {
+      // Clear current markers from the map
+      currentMarkers.forEach(marker => {
+        if (marker.circle) map.removeLayer(marker.circle);
+        if (marker.countMarker) map.removeLayer(marker.countMarker);
+      });
+      currentMarkers = [];
+
+      const selectedTypes = [];
+      if (document.getElementById('rumor-checkbox').checked) selectedTypes.push('RUMOR');
+      if (document.getElementById('hate-speech-checkbox').checked) selectedTypes.push('HATE SPEECH');
+      if (document.getElementById('violent-activity-checkbox').checked) selectedTypes.push('VIOLENT ACTIVITY');
+
+      // If no types are selected, don't show any markers
+      if (selectedTypes.length === 0) {
         return;
       }
 
-      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${config.OPENCAGE_API_KEY}`)
-        .then(response => response.json())
-        .then(data => {
-          const geo = data.results[0]?.geometry;
-          if (!geo) {
-            alert("Could not find the location.");
-            return;
-          }
+      // Filter markers by selected types
+      const filteredMarkers = allMarkers.filter(marker => 
+        selectedTypes.includes(marker.type)
+      );
 
-          const report = {
-            issueType,
-            subType,
-            location,
-            description,
-            lat: geo.lat,
-            lon: geo.lng
-          };
+      // Group markers by type and location
+      const typeLocationGroups = {};
+      filteredMarkers.forEach(marker => {
+        const key = `${marker.type}-${marker.lat.toFixed(4)}-${marker.lng.toFixed(4)}`;
+        if (!typeLocationGroups[key]) {
+          typeLocationGroups[key] = [];
+        }
+        typeLocationGroups[key].push(marker);
+      });
 
-          const reports = JSON.parse(localStorage.getItem("reports") || "[]");
-          reports.push(report);
-          localStorage.setItem("reports", JSON.stringify(reports));
+      // Add markers back to map with count indicators
+      Object.entries(typeLocationGroups).forEach(([key, markers]) => {
+        const type = markers[0].type;
+        const color = activityColors[type] || "gray";
+        const lat = markers[0].lat;
+        const lng = markers[0].lng;
+        
+        // Add circle for this group
+        const circle = L.circle([lat, lng], {
+          radius: 10000,
+          color: color,
+          fillColor: color,
+          fillOpacity: 0.6
+        }).addTo(map);
 
-          addMarker(geo.lat, geo.lng, issueType, description);
-
-          document.getElementById('issueType').value = '';
-          document.getElementById('subType').value = '';
-          document.getElementById('location').value = '';
-          document.getElementById('description').value = '';
-          document.getElementById('email').value = '';
+        // Add count indicator showing number of overlapping reports
+        const icon = L.divIcon({
+          className: 'marker-count',
+          html: `<div style="background: ${color}; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-weight: bold;">${markers.length}</div>`,
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
         });
+
+        const countMarker = L.marker([lat, lng], {
+          icon: icon,
+          zIndexOffset: 1000
+        }).addTo(map);
+
+        // Add popup with all descriptions for this group
+        const descriptions = markers.map(m => m.description).join('<hr>');
+        circle.bindPopup(`
+          <strong>Type:</strong> ${type}<br>
+          <strong>Location:</strong> ${markers[0].location}<br>
+          <strong>Number of Reports at this Location:</strong> ${markers.length}<br>
+          <hr>
+          ${descriptions}
+        `);
+
+        // Store references to the circle and marker
+        currentMarkers.push({
+          circle: circle,
+          countMarker: countMarker,
+          type: type
+        });
+      });
     }
 
+    // Initialize checkboxes to unchecked state
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('rumor-checkbox').checked = false;
+      document.getElementById('hate-speech-checkbox').checked = false;
+      document.getElementById('violent-activity-checkbox').checked = false;
+    });
+
+    // Add styles for the count indicator
+    const style = document.createElement('style');
+    style.textContent = `
+      .marker-count {
+        background: transparent !important;
+        border: none !important;
+      }
+      .marker-count div {
+        box-shadow: 0 0 5px rgba(0,0,0,0.5);
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Add zoom event listener to update clusters when zooming
+    map.on('zoomend', updateMarkers);
+
+    // Load data from Google Sheets
+    fetch("https://script.google.com/macros/s/AKfycbwmcens5pwcDr1SiiVPhJX9itVRTmkQG4l_7-hN4SRmTDCQplrjVQ6yyUFm0L3qlGUz/exec")
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(entry => {
+          const locationName = entry["To The Location"];
+          const type = entry["Type"]?.trim().toUpperCase();
+          const description = entry["Description"];
+
+          fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${config.OPENCAGE_API_KEY}`)
+            .then(res => res.json())
+            .then(geoData => {
+              if (geoData.results.length > 0) {
+                const { lat, lng } = geoData.results[0].geometry;
+                addMarkerToMap(lat, lng, type, locationName, description);
+              }
+            });
+        });
+      })
+      .catch(err => console.error("Failed to load external data:", err));
+
+    // Update markers when DataTable data changes
+    $('#example').on('xhr.dt', function (e, settings, json, xhr) {
+      if (json && Array.isArray(json.data)) {
+        json.data.forEach(row => {
+          const toLocation = row["To The Location"];
+          const reportType = row["Type"]?.toUpperCase();
+          
+          if (!toLocation || !reportType) return;
+
+          fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(toLocation)}&key=${config.OPENCAGE_API_KEY}`)
+            .then(res => res.json())
+            .then(geoData => {
+              const result = geoData.results[0];
+              if (result && result.geometry) {
+                const { lat, lng } = result.geometry;
+                addMarkerToMap(lat, lng, reportType, toLocation, row["Description"]);
+              }
+            })
+            .catch(err => console.error("Geocoding error:", err));
+        });
+      }
+    });
+  </script>
+
+  <script>
+    function showTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Deactivate all tab buttons
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+      });
+      
+      // Show selected tab content
+      document.getElementById(tabId).classList.add('active');
+      
+      // Activate selected tab button
+      event.currentTarget.classList.add('active');
+    }
+  </script>
+
+  <script>
     function showSuggestions() {
       const query = document.getElementById('searchLocation').value.trim();
       const suggestionsList = document.getElementById('suggestions');
@@ -575,162 +790,10 @@
           alert('Could not find the location.');
         }
       } catch (err) {
-        console.error('Error fetching geocode data:', err);
-        alert('An error occurred while searching for the location.');
+          console.error('Error fetching geocode data:', err);
+          alert('An error occurred while searching for the location.');
       }
     }
-
-    const reports = JSON.parse(localStorage.getItem("reports") || "[]");
-    reports.forEach(r => addMarker(r.lat, r.lon, `${r.issueType} - ${r.subType}`, r.description));
-  </script>
-  <script>
-    // Replace with your actual script URL
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwmcens5pwcDr1SiiVPhJX9itVRTmkQG4l_7-hN4SRmTDCQplrjVQ6yyUFm0L3qlGUz/exec";
-    const opencageApiKey = "33bc15e34bc44677836917ce771d2a55"; // Replace with your OpenCageData API key
-  
-    const categoryColors = {
-      political: "red",
-      religious: "blue",
-      ethnic: "green",
-      other: "orange"
-    };
-  
-    // Fetch the spreadsheet data
-    fetch(scriptURL)
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(entry => {
-          const locationName = entry.location;
-          const category = entry.category.toLowerCase();
-  
-          // Geocode the location
-          fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${opencageApiKey}`)
-            .then(res => res.json())
-            .then(geoData => {
-              if (geoData.results.length > 0) {
-                const { lat, lng } = geoData.results[0].geometry;
-  
-                // Create circle on map
-                L.circle([lat, lng], {
-                  radius: 10000, // Adjust as needed
-                  color: categoryColors[category] || "gray",
-                  fillColor: categoryColors[category] || "gray",
-                  fillOpacity: 0.6
-                }).addTo(map)
-                .bindPopup(`<strong>Category:</strong> ${category}<br><strong>Location:</strong> ${locationName}`);
-              }
-            });
-        });
-      })
-      .catch(error => console.error("Error loading data:", error));
-  </script><br>
-  <script>
-    const activityColors = {
-      "VIOLENT ACTIVITY": "red",
-      "RUMOR": "yellow",
-      "HATE SPEECH": "orange"
-    };
-    
-    fetch("https://script.google.com/macros/s/AKfycbwmcens5pwcDr1SiiVPhJX9itVRTmkQG4l_7-hN4SRmTDCQplrjVQ6yyUFm0L3qlGUz/exec")
-      .then(res => res.json())
-      .then(data => {
-        data.forEach(entry => {
-          const locationName = entry["To The Location"];
-          const type = entry["Type"]?.trim().toUpperCase();
-          const description = entry["Description"];
-    
-          const color = activityColors[type] || "gray"; // default to gray if type is unknown
-    
-          fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=33bc15e34bc44677836917ce771d2a55`)
-            .then(res => res.json())
-            .then(geoData => {
-              if (geoData.results.length > 0) {
-                const { lat, lng } = geoData.results[0].geometry;
-    
-                L.circle([lat, lng], {
-                  radius: 10000,
-                  color: color,
-                  fillColor: color,
-                  fillOpacity: 0.6
-                }).addTo(map)
-                  .bindPopup(
-                    `<strong>Type:</strong> ${type}<br>
-                     <strong>Location:</strong> ${locationName}<br>
-                     <strong>Description:</strong> ${description}`
-                  );
-              }
-            });
-        });
-      })
-      .catch(err => console.error("Failed to load external data:", err));
     </script>
-    
-
-    <script>
-      const opencageKey = "33bc15e34bc44677836917ce771d2a55";
-      
-      // Define color mapping based on report type
-      const typeColors = {
-        "VIOLENT ACTIVITY": "red",
-        "RUMOR": "yellow",
-        "HATE SPEECH": "orange"
-      };
-    
-      // Wait for the table to load its data
-      $('#example').on('xhr.dt', function (e, settings, json, xhr) {
-        if (json && Array.isArray(json.data)) {
-          json.data.forEach(row => {
-            const toLocation = row["To The Location"];
-            const reportType = row["Type"]?.toUpperCase(); // Get type from the row
-            
-            // Skip if no location or type
-            if (!toLocation || !reportType) return;
-    
-            // Get color from mapping or default to gray
-            const color = typeColors[reportType] || "gray";
-    
-            fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(toLocation)}&key=${opencageKey}`)
-              .then(res => res.json())
-              .then(geoData => {
-                const result = geoData.results[0];
-                if (result && result.geometry) {
-                  const { lat, lng } = result.geometry;
-                  L.circle([lat, lng], {
-                    radius: 10000,
-                    color: color,
-                    fillColor: color,
-                    fillOpacity: 0.6
-                  }).addTo(map)
-                  .bindPopup(`
-                    <strong>Type:</strong> ${reportType}<br>
-                    <strong>Location:</strong> ${toLocation}
-                  `);
-                }
-              })
-              .catch(err => console.error("Geocoding error:", err));
-          });
-        }
-      });
-    </script>
-
-  <script>
-    function showTab(tabId) {
-      // Hide all tab contents
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      
-      // Deactivate all tab buttons
-      document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active');
-      });
-      
-      // Show selected tab content
-      document.getElementById(tabId).classList.add('active');
-      
-      // Activate selected tab button
-      event.currentTarget.classList.add('active');
-    }
-  </script>
 </body>
 </html>
