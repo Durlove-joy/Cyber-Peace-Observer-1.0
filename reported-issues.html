@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reported Issues - Cyber Peace Observer</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+      min-height: 100vh;
+    }
+    #title {
+      background: linear-gradient(135deg, #1a237e, #0d47a1);
+      color: white;
+      text-align: center;
+      padding: 25px 0;
+      font-size: 32px;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      letter-spacing: 1px;
+    }
+    .content-section {
+      padding: 30px;
+      max-width: 1200px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .content-section h1 {
+      margin: 0 0 30px 0;
+      color: #1a237e;
+      font-size: 28px;
+      text-align: center;
+      position: relative;
+      padding-bottom: 15px;
+    }
+    .content-section h1:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(135deg, #1a237e, #0d47a1);
+    }
+    #example {
+      width: 100%;
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+    .dataTables_wrapper {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      overflow-x: auto;
+    }
+    table.dataTable {
+      width: 100% !important;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    table.dataTable thead th {
+      background: #1a237e;
+      color: white;
+      padding: 12px;
+    }
+    table.dataTable tbody td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    table.dataTable tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+    .menu-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1001;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 10px;
+      transition: transform 0.3s ease;
+    }
+    .menu-button:hover {
+      transform: scale(1.1);
+    }
+    .menu-dropdown {
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: none;
+      z-index: 1001;
+      min-width: 200px;
+    }
+    .menu-dropdown.show {
+      display: block;
+    }
+    .menu-item {
+      display: block;
+      padding: 10px 15px;
+      color: #333;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border-radius: 5px;
+    }
+    .menu-item:hover {
+      background: rgba(26,35,126,0.1);
+      color: #1a237e;
+      transform: translateX(5px);
+    }
+    .menu-separator {
+      height: 1px;
+      background: rgba(0,0,0,0.1);
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="title">Cyber Peace Observer</div>
+  <button class="menu-button" onclick="toggleMenu()">⋮</button>
+  <div class="menu-dropdown" id="menuDropdown">
+    <a href="index.html" class="menu-item">Home</a>
+    <a href="about.html" class="menu-item">About</a>
+    <a href="report-issue.html" class="menu-item">Report an Issue</a>
+    <div class="menu-separator"></div>
+    <a href="terms.html" class="menu-item">Terms and Conditions</a>
+    <a href="privacy-policy.html" class="menu-item">Privacy Policy</a>
+    <a href="mailto:joysarker502815@gmail.com" class="menu-item">Contact</a>
+  </div>
+
+  <div class="content-section">
+    <h1>Reported Issues</h1>
+    <table id="example" class="display">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Category</th>
+          <th>To The Location</th>
+          <th>From The Location</th>
+          <th>Date and Time</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+  <script src="config.js"></script>
+  
+  <script>
+    // Add menu toggle functionality
+    function toggleMenu() {
+      const menu = document.getElementById('menuDropdown');
+      menu.classList.toggle('show');
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('menuDropdown');
+      const menuButton = document.querySelector('.menu-button');
+      if (!menu.contains(event.target) && !menuButton.contains(event.target)) {
+        menu.classList.remove('show');
+      }
+    });
+
+    // Initialize DataTable
+    $(document).ready(function() {
+      $('#example').DataTable({
+        ajax: {
+          url: config.GOOGLE_SHEETS_API_URL,
+          dataSrc: ''
+        },
+        columns: [
+          { data: 'Type' },
+          { data: 'Catagory' },
+          { data: 'To The Location' },
+          { data: 'From The Location' },
+          { 
+            data: 'Date and Time',
+            render: function(data) {
+              return moment(data).format('YYYY-MM-DD HH:mm:ss');
+            }
+          },
+          { data: 'Description' }
+        ],
+        order: [[4, 'desc']], // Sort by date descending
+        pageLength: 10,
+        responsive: true,
+        language: {
+          search: "Search all columns:",
+          lengthMenu: "Show _MENU_ entries per page",
+          info: "Showing _START_ to _END_ of _TOTAL_ entries",
+          infoEmpty: "No entries found",
+          infoFiltered: "(filtered from _MAX_ total entries)"
+        }
+      });
+    });
+  </script>
+</body>
+</html> 
