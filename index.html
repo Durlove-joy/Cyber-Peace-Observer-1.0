@@ -16,6 +16,16 @@
       background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
       min-height: 100vh;
     }
+    .header-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0) 100%);
+      z-index: 999;
+      pointer-events: none;
+    }
     #title {
       position: absolute;
       top: 20px;
@@ -109,16 +119,13 @@
       right: 20px;
       z-index: 1000;
       padding: 10px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
     }
     #search input {
-      padding: 12px 20px;
-      font-size: 16px;
+      padding: 8px 15px;
+      font-size: 14px;
       border: none;
       border-radius: 6px;
-      width: 220px;
+      width: 200px;
       transition: all 0.3s ease;
       background: white;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -128,18 +135,17 @@
       box-shadow: 0 0 0 2px rgba(26,35,126,0.2);
     }
     #search button {
-      padding: 12px 20px;
-      font-size: 16px;
+      padding: 8px 15px;
+      font-size: 14px;
       background: linear-gradient(135deg, #1a237e, #0d47a1);
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      margin-left: 5px;
       transition: all 0.3s ease;
       font-weight: 600;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      height: 48px;
-      white-space: nowrap;
     }
     #search button:hover {
       transform: translateY(-2px);
@@ -150,15 +156,14 @@
       margin: 5px 0 0 0;
       padding: 0;
       background: white;
-      border-radius: 6px;
-      max-height: 200px;
+      border-radius: 4px;
+      max-height: 150px;
       overflow-y: auto;
       display: none;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      z-index: 1001;
     }
     #suggestions li {
-      padding: 10px 15px;
+      padding: 8px;
       cursor: pointer;
       color: #333;
     }
@@ -713,9 +718,51 @@
         max-width: 1140px;
       }
     }
+
+    /* Search Suggestions Styles */
+    #suggestions-container {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin-top: 5px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+
+    .suggestion-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: all 0.2s ease;
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+
+    .suggestion-item:hover {
+      background: #f5f7fa;
+      padding-left: 20px;
+    }
+
+    .suggestion-highlight {
+      font-weight: bold;
+      color: #1a237e;
+    }
+
+    #search {
+      position: relative;  /* Added to contain suggestions dropdown */
+    }
   </style>
 </head>
 <body>
+  <div class="header-container"></div>
   <div id="title">Cyber Peace Observer</div>
   <div id="top-menu" style="
     position: absolute;
@@ -799,7 +846,7 @@
         </svg>
         Privacy Policy
       </a>
-      <a href="mailto:cyberpeaceobserver@gmail.com" style="
+      <a href="mailto:joysarker502815@gmail.com" style="
         display: flex;
         align-items: center;
         gap: 8px;
@@ -917,37 +964,16 @@
     top: 80px;
     right: 20px;
     z-index: 1000;
-    padding: 10px;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;">
-    <div style="position: relative;">
-      <input type="text" id="searchLocation" placeholder="Search Location" oninput="showSuggestions()" style="
-        padding: 12px 20px;
-        font-size: 16px;
-        border: none;
-        border-radius: 6px;
-        width: 220px;
-        transition: all 0.3s ease;
-        background: white;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);" />
-      <ul id="suggestions" style="
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        list-style: none;
-        margin: 5px 0 0 0;
-        padding: 0;
-        background: white;
-        border-radius: 6px;
-        max-height: 200px;
-        overflow-y: auto;
-        display: none;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        z-index: 1001;">
-      </ul>
-    </div>
+    padding: 10px;">
+    <input type="text" id="searchLocation" placeholder="Search Location" oninput="showSuggestions()" style="
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      width: 220px;
+      transition: all 0.3s ease;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);" />
     <button onclick="searchLocation()" style="
       padding: 12px 20px;
       font-size: 16px;
@@ -956,13 +982,25 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      margin-left: 5px;
       transition: all 0.3s ease;
       font-weight: 600;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      height: 48px;
-      white-space: nowrap;">
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
       Search
     </button>
+    <div id="suggestions-container" style="
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      min-width: 220px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1001;">
+    </div>
   </div>
   
   <div class="content-section">
@@ -1049,7 +1087,7 @@
       <div style="margin-bottom: 15px;">
         <a href="index.html" style="color: #ffffff; text-decoration: none; margin: 0 15px; font-weight: 500;">Home</a>
         <a href="about.html" style="color: #ffffff; text-decoration: none; margin: 0 15px; font-weight: 500;">About</a>
-        <a href="mailto:cyberpeaceobserver@gmail.com" style="color: #ffffff; text-decoration: none; margin: 0 15px; font-weight: 500;">Contact</a>
+        <a href="mailto:joysarker502815@gmail.com" style="color: #ffffff; text-decoration: none; margin: 0 15px; font-weight: 500;">Contact</a>
         <a href="privacy-policy.html" style="color: #ffffff; text-decoration: none; margin: 0 15px; font-weight: 500;">Privacy Policy</a>
         <a href="terms.html" style="color: #ffffff; text-decoration: none; margin: 0 15px; font-weight: 500;">Terms of Service</a>
       </div>
@@ -1319,7 +1357,7 @@
         // Add new markers
         json.data.forEach(report => {
           if (report['To The Location']) {
-            fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(report['To The Location'])}&key=33bc15e34bc44677836917ce771d2a55`)
+            fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(report['To The Location'])}&key=${config.OPEN_CAGE_API_KEY}`)
               .then(response => response.json())
               .then(geoData => {
                 if (geoData.results && geoData.results.length > 0) {
@@ -1351,7 +1389,7 @@
           
           data.forEach(report => {
             if (report['To The Location']) {
-              fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(report['To The Location'])}&key=33bc15e34bc44677836917ce771d2a55`)
+              fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(report['To The Location'])}&key=${config.OPEN_CAGE_API_KEY}`)
                 .then(response => response.json())
                 .then(geoData => {
                   if (geoData.results && geoData.results.length > 0) {
@@ -1396,87 +1434,118 @@
   </script>
 
   <script>
+    let debounceTimer;
+    
     function showSuggestions() {
       const query = document.getElementById('searchLocation').value.trim();
-      const suggestionsList = document.getElementById('suggestions');
-
+      const container = document.getElementById('suggestions-container');
+      
+      // Clear previous timer
+      clearTimeout(debounceTimer);
+      
       if (!query) {
-        suggestionsList.style.display = 'none';
+        container.style.display = 'none';
         return;
       }
 
-      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=33bc15e34bc44677836917ce771d2a55&limit=5`)
-        .then(response => response.json())
-        .then(data => {
-          const suggestions = data.results.map(result => result.formatted);
-          suggestionsList.innerHTML = '';
-
-          if (suggestions.length > 0) {
-            suggestions.forEach(suggestion => {
-              const li = document.createElement('li');
-              li.textContent = suggestion;
-              li.style.cssText = `
-                padding: 10px 15px;
-                cursor: pointer;
-                border-bottom: 1px solid #eee;
-                transition: background-color 0.2s ease;
-              `;
-              li.addEventListener('mouseover', () => {
-                li.style.backgroundColor = '#f5f5f5';
+      // Add debounce to avoid too many API calls
+      debounceTimer = setTimeout(() => {
+        fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=${config.OPEN_CAGE_API_KEY}&limit=5`)
+          .then(response => response.json())
+          .then(data => {
+            container.innerHTML = '';
+            
+            if (data.results && data.results.length > 0) {
+              data.results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                
+                // Highlight the matching part
+                const location = result.formatted;
+                const regex = new RegExp(query, 'gi');
+                const highlightedText = location.replace(regex, match => `<span class="suggestion-highlight">${match}</span>`);
+                
+                div.innerHTML = highlightedText;
+                
+                div.addEventListener('click', () => {
+                  document.getElementById('searchLocation').value = location;
+                  container.style.display = 'none';
+                  searchLocation();
+                });
+                
+                container.appendChild(div);
               });
-              li.addEventListener('mouseout', () => {
-                li.style.backgroundColor = 'white';
-              });
-              li.addEventListener('click', () => {
-                document.getElementById('searchLocation').value = suggestion;
-                suggestionsList.style.display = 'none';
-                searchLocation(); // Automatically search when suggestion is clicked
-              });
-              suggestionsList.appendChild(li);
-            });
-            suggestionsList.style.display = 'block';
-          } else {
-            suggestionsList.style.display = 'none';
-          }
-        })
-        .catch(err => {
-          console.error('Error fetching suggestions:', err);
-          suggestionsList.style.display = 'none';
-        });
+              
+              container.style.display = 'block';
+            } else {
+              container.style.display = 'none';
+            }
+          })
+          .catch(err => {
+            console.error('Error fetching suggestions:', err);
+            container.style.display = 'none';
+          });
+      }, 300); // 300ms delay
     }
 
     // Close suggestions when clicking outside
-    document.addEventListener('click', (event) => {
-      const searchContainer = document.getElementById('search');
-      const suggestionsList = document.getElementById('suggestions');
-      if (!searchContainer.contains(event.target)) {
-        suggestionsList.style.display = 'none';
+    document.addEventListener('click', (e) => {
+      const container = document.getElementById('suggestions-container');
+      const searchInput = document.getElementById('searchLocation');
+      
+      if (!searchInput.contains(e.target) && !container.contains(e.target)) {
+        container.style.display = 'none';
       }
     });
 
-    async function searchLocation() {
-      const location = document.getElementById('searchLocation').value.trim();
-      if (!location) {
-        alert('Please enter a location to search.');
-        return;
+    // Handle keyboard navigation
+    document.getElementById('searchLocation').addEventListener('keydown', (e) => {
+      const container = document.getElementById('suggestions-container');
+      const items = container.getElementsByClassName('suggestion-item');
+      let currentIndex = -1;
+
+      // Find currently focused item
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].classList.contains('suggestion-highlight')) {
+          currentIndex = i;
+          break;
+        }
       }
 
-      try {
-        const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=33bc15e34bc44677836917ce771d2a55`);
-        const data = await response.json();
-        
-        if (data.results && data.results.length > 0) {
-          const geo = data.results[0].geometry;
-          const currentZoom = map.getZoom(); // Get current zoom level
-          map.setView([geo.lat, geo.lng], currentZoom); // Keep current zoom level
-        } else {
-          alert('Could not find the location.');
-        }
-      } catch (err) {
-          console.error('Error fetching geocode data:', err);
-          alert('An error occurred while searching for the location.');
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          if (currentIndex < items.length - 1) {
+            if (currentIndex >= 0) items[currentIndex].classList.remove('suggestion-highlight');
+            items[currentIndex + 1].classList.add('suggestion-highlight');
+            items[currentIndex + 1].scrollIntoView({ block: 'nearest' });
+          }
+          break;
+          
+        case 'ArrowUp':
+          e.preventDefault();
+          if (currentIndex > 0) {
+            items[currentIndex].classList.remove('suggestion-highlight');
+            items[currentIndex - 1].classList.add('suggestion-highlight');
+            items[currentIndex - 1].scrollIntoView({ block: 'nearest' });
+          }
+          break;
+          
+        case 'Enter':
+          e.preventDefault();
+          if (currentIndex >= 0) {
+            const selectedItem = items[currentIndex];
+            document.getElementById('searchLocation').value = selectedItem.textContent;
+            container.style.display = 'none';
+            searchLocation();
+          }
+          break;
+          
+        case 'Escape':
+          container.style.display = 'none';
+          break;
       }
-    }
+    });
   </script>
 
   <script>
@@ -1681,6 +1750,47 @@
         menuButton.querySelector('svg').style.transform = 'rotate(0)';
       }
     });
+  </script>
+
+  <script>
+    function searchLocation() {
+      const query = document.getElementById('searchLocation').value.trim();
+      
+      if (!query) {
+        return;
+      }
+
+      fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query)}&key=${config.OPEN_CAGE_API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.results && data.results.length > 0) {
+            const location = data.results[0].geometry;
+            // Center map on the found location
+            map.setView([location.lat, location.lng], 10);
+            
+            // Create a temporary marker to highlight the searched location
+            const searchMarker = L.marker([location.lat, location.lng], {
+              icon: L.divIcon({
+                className: 'search-marker',
+                html: '<div style="background: #1a237e; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold;">📍</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+              })
+            }).addTo(map);
+
+            // Remove the marker after 5 seconds
+            setTimeout(() => {
+              map.removeLayer(searchMarker);
+            }, 5000);
+          } else {
+            alert('Location not found. Please try a different search term.');
+          }
+        })
+        .catch(err => {
+          console.error('Error searching location:', err);
+          alert('Error searching location. Please try again.');
+        });
+    }
   </script>
 </body>
 </html>
