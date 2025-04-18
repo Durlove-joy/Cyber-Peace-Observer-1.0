@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Cyber Peace Observer</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
@@ -340,10 +339,8 @@
       #search input {
         width: 100%;
         margin-bottom: 0;
-        font-size: 16px;
+        font-size: 14px;
         padding: 10px 15px;
-        -webkit-appearance: none;
-        appearance: none;
       }
       #search button {
         width: 100%;
@@ -925,15 +922,7 @@
     align-items: flex-start;
     gap: 10px;">
     <div style="position: relative;">
-      <input type="text" 
-        id="searchLocation" 
-        placeholder="Search Location" 
-        oninput="showSuggestions()" 
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        style="
+      <input type="text" id="searchLocation" placeholder="Search Location" oninput="showSuggestions()" style="
         padding: 12px 20px;
         font-size: 16px;
         border: none;
@@ -1478,7 +1467,8 @@
         
         if (data.results && data.results.length > 0) {
           const geo = data.results[0].geometry;
-          map.setView([geo.lat, geo.lng], 10);
+          const currentZoom = map.getZoom(); // Get current zoom level
+          map.setView([geo.lat, geo.lng], currentZoom); // Keep current zoom level
         } else {
           alert('Could not find the location.');
         }
