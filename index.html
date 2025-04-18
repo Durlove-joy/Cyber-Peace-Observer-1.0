@@ -5,6 +5,7 @@
   <title>Cyber Peace Observer</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" />
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -17,18 +18,17 @@
     }
     #title {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: transparent;
+      top: 20px;
+      left: 20px;
       color: white;
-      text-align: center;
-      padding: 25px 0;
+      text-align: left;
+      padding: 15px 25px;
       font-size: 32px;
       font-weight: bold;
       z-index: 1000;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-      letter-spacing: 1px;
+      font-family: 'Cinzel', serif;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+      letter-spacing: 2px;
       pointer-events: none;
     }
     #viewGraphsBtn {
@@ -299,8 +299,9 @@
     @media (max-width: 768px) {
       #title {
         font-size: 24px;
-        padding: 15px 0;
-        position: relative;
+        padding: 10px 20px;
+        top: 10px;
+        left: 10px;
       }
       #map {
         height: 400px;
@@ -591,15 +592,50 @@
 
     @media (max-width: 768px) {
       #map-nav-buttons {
-        top: 60px;
+        top: 70px;
         left: 10px;
-        padding: 10px;
+        padding: 12px;
       }
       
       #map-nav-buttons button {
-        padding: 8px 15px;
-        width: 150px;
-        font-size: 14px;
+        padding: 12px 20px;
+        width: 220px;
+        font-size: 15px;
+      }
+
+      #search {
+        top: 70px;
+        right: 10px;
+      }
+
+      #search input {
+        padding: 12px 16px;
+        font-size: 15px;
+        width: 160px;
+      }
+
+      #search button {
+        padding: 12px 16px;
+        font-size: 15px;
+      }
+
+      #filter-buttons {
+        padding: 15px;
+      }
+
+      #filter-buttons div {
+        font-size: 15px;
+      }
+
+      #filter-buttons span {
+        padding: 10px 16px;
+        font-size: 15px;
+      }
+
+      .marker-count div {
+        font-size: 14px !important;
+        width: 28px !important;
+        height: 28px !important;
       }
     }
 
@@ -611,8 +647,8 @@
 
     @media (max-width: 768px) {
       #dataAnalysisBtn {
-        top: 15px;
-        right: 10px;
+        top: 20px;
+        right: 20px;
         padding: 8px 15px;
         font-size: 14px;
       }
@@ -623,7 +659,7 @@
   <div id="title">Cyber Peace Observer</div>
   <button id="dataAnalysisBtn" style="
     position: absolute;
-    top: 25px;
+    top: 20px;
     right: 20px;
     z-index: 1000;
     padding: 10px 20px;
@@ -645,11 +681,10 @@
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 15px;
-    border-radius: 10px;">
+    gap: 12px;
+    padding: 15px;">
     <button onclick="showTab('reported-issues'); document.querySelector('.content-section').scrollIntoView({ behavior: 'smooth' })" style="
-      padding: 10px 20px;
+      padding: 12px 24px;
       background: linear-gradient(135deg, #1a237e, #0d47a1);
       color: white;
       border: none;
@@ -657,13 +692,15 @@
       cursor: pointer;
       font-weight: 600;
       transition: all 0.3s ease;
-      width: 180px;
+      width: 240px;
       text-align: left;
+      font-size: 16px;
+      white-space: nowrap;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
       📋 Reported Issues
     </button>
     <button onclick="showTab('report-issue'); document.querySelector('.content-section').scrollIntoView({ behavior: 'smooth' })" style="
-      padding: 10px 20px;
+      padding: 12px 24px;
       background: linear-gradient(135deg, #1a237e, #0d47a1);
       color: white;
       border: none;
@@ -671,8 +708,10 @@
       cursor: pointer;
       font-weight: 600;
       transition: all 0.3s ease;
-      width: 180px;
+      width: 240px;
       text-align: left;
+      font-size: 16px;
+      white-space: nowrap;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
       ✏️ Report an Issue
     </button>
@@ -683,19 +722,19 @@
     left: 20px;
     z-index: 1000;
     padding: 20px;">
-    <div style="margin-bottom: 10px; font-weight: bold; color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Filter by Activity Type:</div>
-    <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="margin-bottom: 12px; font-weight: bold; color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); font-size: 16px;">Filter by Activity Type:</div>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
       <label style="display: flex; align-items: center; cursor: pointer;">
-        <input type="checkbox" id="rumor-checkbox" onchange="updateMarkers()" style="margin-right: 8px;">
-        <span style="background: #ffd700; color: #fffbfb; padding: 8px 15px; border-radius: 6px; width: 100%; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Rumor</span>
+        <input type="checkbox" id="rumor-checkbox" onchange="updateMarkers()" style="margin-right: 10px; width: 18px; height: 18px;">
+        <span style="background: #ffd700; color: #fffbfb; padding: 10px 20px; border-radius: 6px; width: 100%; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 16px;">Rumor</span>
       </label>
       <label style="display: flex; align-items: center; cursor: pointer;">
-        <input type="checkbox" id="hate-speech-checkbox" onchange="updateMarkers()" style="margin-right: 8px;">
-        <span style="background: #808080; color: #ffffff; padding: 8px 15px; border-radius: 6px; width: 100%; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Hate Speech</span>
+        <input type="checkbox" id="hate-speech-checkbox" onchange="updateMarkers()" style="margin-right: 10px; width: 18px; height: 18px;">
+        <span style="background: #808080; color: #ffffff; padding: 10px 20px; border-radius: 6px; width: 100%; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 16px;">Hate Speech</span>
       </label>
       <label style="display: flex; align-items: center; cursor: pointer;">
-        <input type="checkbox" id="violent-activity-checkbox" onchange="updateMarkers()" style="margin-right: 8px;">
-        <span style="background: #ff0000; color: #f9f9f9; padding: 8px 15px; border-radius: 6px; width: 100%; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">Violent Activity</span>
+        <input type="checkbox" id="violent-activity-checkbox" onchange="updateMarkers()" style="margin-right: 10px; width: 18px; height: 18px;">
+        <span style="background: #ff0000; color: #f9f9f9; padding: 10px 20px; border-radius: 6px; width: 100%; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 16px;">Violent Activity</span>
       </label>
     </div>
   </div>
@@ -707,17 +746,17 @@
     z-index: 1000;
     padding: 10px;">
     <input type="text" id="searchLocation" placeholder="Search Location" oninput="showSuggestions()" style="
-      padding: 8px 15px;
-      font-size: 14px;
+      padding: 12px 20px;
+      font-size: 16px;
       border: none;
       border-radius: 6px;
-      width: 200px;
+      width: 220px;
       transition: all 0.3s ease;
       background: white;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);" />
     <button onclick="searchLocation()" style="
-      padding: 8px 15px;
-      font-size: 14px;
+      padding: 12px 20px;
+      font-size: 16px;
       background: linear-gradient(135deg, #1a237e, #0d47a1);
       color: white;
       border: none;
@@ -729,17 +768,6 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
       Search
     </button>
-    <ul id="suggestions" style="
-      list-style: none;
-      margin: 5px 0 0 0;
-      padding: 0;
-      background: white;
-      border-radius: 4px;
-      max-height: 150px;
-      overflow-y: auto;
-      display: none;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-    </ul>
   </div>
   
   <div class="content-section">
