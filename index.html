@@ -510,7 +510,7 @@
         <button class="tab-button" onclick="showTab('report-issue')">Report an Issue</button>
       </div>
       
-      <div id="reported-issues" class="tab-content" style="display: none;">
+      <div id="reported-issues" class="tab-content active">
         <table id="example" class="display">
           <thead>
             <tr>
@@ -525,9 +525,9 @@
         </table>
       </div>
 
-      <div id="report-issue" class="tab-content" style="display: none;">
+      <div id="report-issue" class="tab-content">
         <script src="config.js"></script>
-        <script src="https://sheetdb.io/s/f/gk4ag43gyg19l.js"></script>
+    <script src="https://sheetdb.io/s/f/gk4ag43gyg19l.js"></script>
       </div>
     </div>
   </div>
@@ -592,16 +592,9 @@
 
   <script>
     const isMobile = window.innerWidth <= 768;
-    const initialZoom = isMobile ? 4 : 2;
-    const initialCenter = isMobile ? [20, 0] : [20, 0];
+    const initialZoom = isMobile ? 3 : 2;
 
-    const map = L.map('map', {
-      zoomControl: true,
-      center: initialCenter,
-      zoom: initialZoom,
-      maxZoom: 19,
-      minZoom: 2
-    });
+    const map = L.map('map').setView([20, 0], initialZoom);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
@@ -610,14 +603,6 @@
     }).addTo(map);
 
     map.zoomControl.setPosition('bottomright');
-
-    setTimeout(() => {
-      map.invalidateSize();
-    }, 100);
-
-    window.addEventListener('resize', () => {
-      map.invalidateSize();
-    });
 
     let allMarkers = [];
     let currentMarkers = [];
@@ -852,7 +837,7 @@
     function showTab(tabId) {
       // Hide all tab contents
       document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.style.display = 'none';
+        tab.classList.remove('active');
       });
       
       // Deactivate all tab buttons
@@ -861,7 +846,7 @@
       });
       
       // Show selected tab content
-      document.getElementById(tabId).style.display = 'block';
+      document.getElementById(tabId).classList.add('active');
       
       // Activate selected tab button
       event.currentTarget.classList.add('active');
